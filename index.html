@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Torna — სამეგობრო გალერეა (ფოტოები და მოგონებები)</title>
+  <meta name="description" content="Torna — სამეგობრო გალერეა, სადაც ყველა ატვირთავს ფოტოებს და ინახავს მოგონებებს. სწრაფი ატვირთვა, ტეგები, ძიება, საერთო ალბომი."/>
+  <link rel="canonical" href="https://example.com/"/>
+  <meta property="og:title" content="Torna — სამეგობრო გალერეა"/>
+  <meta property="og:description" content="ატვირთე ფოტოები და შეინახე მოგონებები მეგობრებთან ერთად."/>
+  <meta property="og:type" content="website"/>
+
+  <meta property="og:url" content="https://example.com/"/>
+  <meta property="og:image" content="https://example.com/og-cover.jpg"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <script type="application/ld+json">{
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"Torna",
+    "url":"https://example.com/",
+    "potentialAction":{"@type":"SearchAction","target":"https://example.com/?q={search_term_string}","query-input":"required name=search_term_string"}
+  }</script>
+  <style>
+    :root{
+      --bg:#0f0f11;--panel:#17171a;--muted:#a6a7ab;--text:#f2f3f5;--brand:#5b8cff;--brand-2:#7bc3ff;--ok:#39d98a;--warn:#f5c451;--danger:#ff6b6b;
+      --shadow:0 10px 25px rgba(0,0,0,.35);
+    }
+    [data-theme="light"]{--bg:#f6f7fb;--panel:#ffffff;--muted:#5b5e66;--text:#101216;--brand:#3a6eff;--brand-2:#0ea5e9;--shadow:0 6px 18px rgba(0,0,0,.12)}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+    h1{font-size:20px;margin:0;display:flex;gap:10px;align-items:center}
+    .badge{font-size:11px;color:var(--panel);background:linear-gradient(135deg,var(--brand),var(--brand-2));padding:2px 8px;border-radius:999px}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .btn{appearance:none;border:1px solid transparent;background:var(--panel);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;box-shadow:var(--shadow);transition:.2s}
+    .btn:hover{transform:translateY(-1px);}
+    .btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#0b1220}
+    .btn.ghost{background:transparent;border-color:#2a2c33}
+    .btn.danger{background:linear-gradient(135deg,#ff7d7d,#ff3b3b);color:#1b0000}
+    input[type="text"], input[type="search"], textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2a2c33;background:var(--panel);color:var(--text);outline:none}
+    textarea{min-height:72px;resize:vertical}
+    .panel{background:var(--panel);border:1px solid #2a2c33;border-radius:16px;box-shadow:var(--shadow)}
+
+    /* Uploader */
+    .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .drop{display:grid;place-items:center;gap:10px;padding:22px;border:2px dashed #2a2c33;border-radius:16px;text-align:center;min-height:160px}
+    .drop.drag{border-color:var(--brand);background:rgba(91,140,255,.07)}
+    .meta{display:grid;gap:10px;padding:16px}
+
+    /* Gallery */
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:18px 0}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .card{background:var(--panel);border:1px solid #2a2c33;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-height:100px}
+    .card img{width:100%;height:220px;object-fit:cover;background:#0c0c0e}
+    .card .content{padding:10px 12px;display:grid;gap:6px}
+    .muted{color:var(--muted);font-size:12px}
+    .tags{display:flex;flex-wrap:wrap;gap:6px}
+    .tag{font-size:11px;color:var(--brand-2);background:rgba(123,195,255,.12);border:1px solid rgba(123,195,255,.25);padding:2px 8px;border-radius:999px}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .row .btn{padding:8px 10px;border-radius:10px}
+    .empty{opacity:.8;text-align:center;padding:32px}
+
+    .footer{opacity:.7;text-align:center;margin:28px 0 8px}
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="container">
+    <header>
+      <h1>Torna <span class="badge">HTML • CSS • JS</span></h1>
+      <div class="controls">
+        <button id="themeBtn" class="btn ghost" title="თემის შეცვლა">🌗 თემა</button>
+        <button id="exportBtn" class="btn ghost" title="გამოტანა JSON ფაილად">⤴︎ Export</button>
+        <label class="btn ghost" title="იმპორტი JSON ფაილიდან">
+          ⤵︎ Import
+          <input id="importInput" type="file" accept="application/json" hidden>
+        </label>
+        <button id="clearBtn" class="btn danger" title="ყველა ჩანაწერის წაშლა">🗑 გასუფთავება</button>
+      </div>
+    </header>
+
+    <section class="panel" style="padding:16px">
+      <div class="grid">
+        <div>
+          <div id="drop" class="drop">
+            <div style="font-size:22px">📷 ჩაუშვი/აირჩიე ფოტოები</div>
+            <div class="muted">ერთდროულად მრავალი ფაილი შეგიძლიათ დაამატოთ (JPG/PNG/WebP)</div>
+            <label class="btn primary" style="margin-top:6px">
+              აირჩიე ფაილები
+              <input id="fileInput" type="file" accept="image/*" multiple hidden>
+            </label>
+          </div>
+        </div>
+        <div class="meta">
+          <input id="author" type="text" placeholder="ვინ აზიარებს? (სახელი)" />
+          <textarea id="caption" placeholder="მოკლე აღწერა / მოგონება"></textarea>
+          <input id="tags" type="text" placeholder="ტეგები (მაგ: ზაფხული, ზღვა, მეგობრები)" />
+          <button id="saveBtn" class="btn primary">შენახვა გალერიაში</button>
+          <div class="muted">⚠️ ფოტოები ინახება თქვენს ბრაუზერში (IndexedDB). გასაზიარებლად გამოიყენეთ Export/Import ან დააკავშირეთ მომავალში სერვერთან.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="ძიება: სახელი, აღწერა ან ტეგი…" style="max-width:420px">
+      <div class="controls">
+        <span class="muted" id="countLabel">0 ფოტო</span>
+      </div>
+    </div>
+
+    <section id="gallery" class="gallery" aria-live="polite"></section>
+    <div id="empty" class="empty muted" style="display:none">ჯერჯერობით არაფერია. ატვირთეთ ფოტოები ზემოთ და შეინახეთ მოგონებები ✨</div>
+
+    <div class="footer muted">გაკეთებულია მეგობრებისთვის 💙 — მუშაობს ოფლაინში, ინახავს ლოკალურად. Production რეჟიმში დაამატეთ backend ( напр. Firebase / Supabase ) საერთო გამოყენებისთვის.</div>
+  </div>
+
+<script>
+// -------------------------------
+// Utility: tiny IndexedDB wrapper
+// -------------------------------
+const DB_NAME = 'friendsGalleryDB';
+const DB_VER = 1;
+const STORE = 'photos';
+let db;
+
+function openDB(){
+  return new Promise((resolve, reject)=>{
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = (e)=>{
+      const d = e.target.result;
+      const store = d.createObjectStore(STORE,{keyPath:'id', autoIncrement:true});
+      store.createIndex('createdAt','createdAt');
+      store.createIndex('text','text'); // for search
+    };
+    req.onsuccess = ()=>{ db = req.result; resolve(db); };
+    req.onerror = ()=>reject(req.error);
+  });
+}
+
+function tx(mode='readonly'){
+  const t = db.transaction(STORE, mode);
+  return {store: t.objectStore(STORE), done: new Promise(res=>t.oncomplete=res)};
+}
+
+async function addPhoto(rec){
+  const {store, done} = tx('readwrite');
+  store.add(rec);
+  await done; return true;
+}
+
+async function getAll(){
+  return new Promise((resolve,reject)=>{
+    const {store} = tx('readonly');
+    const req = store.getAll();
+    req.onsuccess = ()=>resolve(req.result.sort((a,b)=>b.createdAt-a.createdAt));
+    req.onerror = ()=>reject(req.error);
+  });
+}
+
+async function remove(id){
+  const {store, done} = tx('readwrite');
+  store.delete(id); await done;
+}
+
+async function clearAll(){
+  const {store, done} = tx('readwrite');
+  store.clear(); await done;
+}
+
+async function exportJSON(){
+  const items = await getAll();
+  const clean = items.map(({id, name, caption, tags, createdAt, author, imageType, thumb})=>({id, name, caption, tags, createdAt, author, imageType, thumb}));
+  const blob = new Blob([JSON.stringify(clean,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'),{href:url,download:'friends-gallery-export.json'});
+  a.click(); URL.revokeObjectURL(url);
+}
+
+async function importJSON(file){
+  const text = await file.text();
+  const arr = JSON.parse(text);
+  const {store, done} = tx('readwrite');
+  for(const itm of arr){ store.add(itm); }
+  await done; return true;
+}
+
+// -------------------------------
+// Image helpers
+// -------------------------------
+function fileToImageBitmap(file){
+  return createImageBitmap(file);
+}
+
+async function createThumbnail(imgBitmap, maxW=1200){
+  const scale = Math.min(1, maxW / imgBitmap.width);
+  const w = Math.round(imgBitmap.width*scale), h = Math.round(imgBitmap.height*scale);
+  const canvas = Object.assign(document.createElement('canvas'),{width:w,height:h});
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(imgBitmap,0,0,w,h);
+  // JPEG for better size; quality 0.82
+  return await new Promise(res=>canvas.toBlob(b=>{
+    const reader = new FileReader();
+    reader.onload = ()=>res(reader.result); // dataURL
+    reader.readAsDataURL(b);
+  }, 'image/jpeg', 0.82));
+}
+
+// -------------------------------
+// UI & State
+// -------------------------------
+const els = {
+  drop: document.getElementById('drop'),
+  fileInput: document.getElementById('fileInput'),
+  saveBtn: document.getElementById('saveBtn'),
+  author: document.getElementById('author'),
+  caption: document.getElementById('caption'),
+  tags: document.getElementById('tags'),
+  gallery: document.getElementById('gallery'),
+  empty: document.getElementById('empty'),
+  search: document.getElementById('search'),
+  count: document.getElementById('countLabel'),
+  exportBtn: document.getElementById('exportBtn'),
+  importInput: document.getElementById('importInput'),
+  clearBtn: document.getElementById('clearBtn'),
+  themeBtn: document.getElementById('themeBtn')
+};
+
+let pendingFiles = [];
+
+function setTheme(mode){
+  document.body.setAttribute('data-theme', mode);
+  localStorage.setItem('fg_theme', mode);
+}
+
+function toggleTheme(){
+  const cur = document.body.getAttribute('data-theme');
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+}
+
+function humanDate(ms){
+  const d = new Date(ms);
+  return d.toLocaleString();
+}
+
+function renderCount(n){
+  els.count.textContent = n + (n === 1 ? ' ფოტო' : ' ფოტო');
+}
+
+function tagChips(tags){
+  return tags.filter(Boolean).map(t=>`<span class="tag">#${escapeHTML(t)}</span>`).join(' ');
+}
+
+function escapeHTML(s=''){
+  return s.replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",
+  ">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+}
+
+function matchesQuery(item, q){
+  if(!q) return true;
+  const hay = `${item.author||''} ${item.caption||''} ${(item.tags||[]).join(' ')}`.toLowerCase();
+  return hay.includes(q.toLowerCase());
+}
+
+function cardHTML(item){
+  const src = item.thumb || '';
+  const name = escapeHTML(item.name || 'ფოტო');
+  const cap = escapeHTML(item.caption || '');
+  const author = escapeHTML(item.author || 'უცნობი');
+  const time = humanDate(item.createdAt);
+  const tags = tagChips(item.tags||[]);
+  return `<article class="card" data-id="${item.id}">
+    <img loading="lazy" src="${src}" alt="${name}">
+    <div class="content">
+      <div class="row" style="justify-content:space-between">
+        <div class="muted">👤 ${author}</div>
+        <div class="muted">🗓 ${time}</div>
+      </div>
+      ${cap?`<div>${cap}</div>`:''}
+      ${tags?`<div class="tags">${tags}</div>`:''}
+      <div class="row" style="margin-top:6px">
+        <button class="btn ghost" data-action="download">⬇︎ ჩაწერა</button>
+        <button class="btn ghost" data-action="edit">✎ რედაქტირება</button>
+        <button class="btn ghost" data-action="delete">🗑 წაშლა</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+async function renderGallery(){
+  const q = els.search.value.trim();
+  const items = (await getAll()).filter(it=>matchesQuery(it,q));
+  els.gallery.innerHTML = items.map(cardHTML).join('');
+  renderCount(items.length);
+  els.empty.style.display = items.length ? 'none' : 'block';
+}
+
+async function handleCardClick(e){
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const card = e.target.closest('.card');
+  const id = Number(card.dataset.id);
+  const items = await getAll();
+  const item = items.find(x=>x.id===id);
+  const action = btn.dataset.action;
+
+  if(action==='delete'){
+    if(confirm('წავშალოთ ეს ფოტო?')){ await remove(id); await renderGallery(); }
+  }
+  else if(action==='download'){
+    const a = document.createElement('a');
+    a.href = item.thumb; a.download = (item.name||'photo')+'.jpg'; a.click();
+  }
+  else if(action==='edit'){
+    const cap = prompt('აღწერა / მოგონება:', item.caption||'');
+    if(cap===null) return;
+    const tags = prompt('ტეგები (ვეცალკე მძიმით):', (item.tags||[]).join(', '));
+    const {store, done} = tx('readwrite');
+    item.caption = cap; item.tags = (tags||'').split(',').map(s=>s.trim()).filter(Boolean);
+    store.put(item); await done; await renderGallery();
+  }
+}
+
+// -------------------------------
+// Upload flow
+// -------------------------------
+function setDrag(v){ els.drop.classList.toggle('drag', v); }
+
+function onDrop(e){
+  e.preventDefault(); setDrag(false);
+  const files = [...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));
+  if(files.length) {
+    pendingFiles.push(...files);
+    toast(`${files.length} ფაილი არჩეულია. დააჭირე "შენახვა გალერიაში"`);
+  }
+}
+
+function onPick(e){
+  const files = [...e.target.files].filter(f=>f.type.startsWith('image/'));
+  if(files.length){ pendingFiles.push(...files); toast(`${files.length} ფაილი არჩეულია.`); }
+  e.target.value='';
+}
+
+function toast(msg){
+  const el = document.createElement('div');
+  el.textContent = msg; el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#222a;backdrop-filter:blur(6px);padding:10px 14px;border-radius:12px;border:1px solid #2a2c33;color:#fff;z-index:9999;';
+  document.body.appendChild(el); setTimeout(()=>el.remove(), 2000);
+}
+
+async function saveAll(){
+  if(!pendingFiles.length){ toast('ჯერ აირჩიე ფოტოები'); return; }
+  const author = els.author.value.trim();
+  const caption = els.caption.value.trim();
+  const tags = els.tags.value.split(',').map(s=>s.trim()).filter(Boolean);
+  for(const file of pendingFiles){
+    const bitmap = await fileToImageBitmap(file);
+    const thumb = await createThumbnail(bitmap, 1600); // good quality
+    const rec = {
+      name: file.name.replace(/\.[^.]+$/,''),
+      author, caption, tags,
+      createdAt: Date.now(),
+      imageType: 'image/jpeg',
+      // We only store compressed dataURL for space. For full-fidelity keep file blob too (optional)
+      thumb
+    };
+    await addPhoto(rec);
+  }
+  pendingFiles = [];
+  els.caption.value=''; els.tags.value='';
+  await renderGallery(); toast('შენახულია ✅');
+}
+
+// -------------------------------
+// Init
+// -------------------------------
+(async function init(){
+  setTheme(localStorage.getItem('fg_theme')||'dark');
+  await openDB();
+  await renderGallery();
+
+  // Drag & drop
+  ['dragenter','dragover'].forEach(ev=>els.drop.addEventListener(ev,(e)=>{e.preventDefault(); setDrag(true);}));
+  ['dragleave','drop'].forEach(ev=>els.drop.addEventListener(ev,()=>setDrag(false)));
+  els.drop.addEventListener('drop', onDrop);
+
+  // Inputs
+  els.fileInput.addEventListener('change', onPick);
+  els.saveBtn.addEventListener('click', saveAll);
+  els.gallery.addEventListener('click', handleCardClick);
+  els.search.addEventListener('input', ()=>renderGallery());
+
+  // Theme / export / import / clear
+  els.themeBtn.addEventListener('click', toggleTheme);
+  els.exportBtn.addEventListener('click', exportJSON);
+  els.importInput.addEventListener('change', async (e)=>{ const f=e.target.files[0]; if(!f) return; await importJSON(f); await renderGallery(); toast('იმპორტი დასრულდა'); e.target.value=''; });
+  els.clearBtn.addEventListener('click', async ()=>{ if(confirm('ნამდვილად გასუფთავება?')){ await clearAll(); await renderGallery(); }});
+})();
+</script>
+<script type="module">
+// Optional BACKEND (Firebase) — set window.FIREBASE_CONFIG below and it will sync to cloud
+// 1) Create Firebase project (console.firebase.google.com)
+// 2) Enable Authentication → Sign-in method → Anonymous
+// 3) Enable Firestore & Storage
+// 4) Add Web app and copy config into window.FIREBASE_CONFIG
+// 5) Set Security Rules (examples in comments)
+
+// --- put your config here ---
+window.FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
+  // apiKey: "",
+  // authDomain: "",
+  // projectId: "",
+  // storageBucket: "",
+  // appId: ""
+};
+
+const hasConfig = Object.keys(window.FIREBASE_CONFIG||{}).length > 0;
+if(hasConfig){
+  (async ()=>{
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js');
+    const { getAuth, signInAnonymously, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js');
+    const { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js');
+    const { getStorage, ref, uploadString, getDownloadURL, deleteObject } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js');
+
+    const app = initializeApp(window.FIREBASE_CONFIG);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    await new Promise((res)=>{
+      onAuthStateChanged(auth, (u)=>{ if(u) res(u); });
+      signInAnonymously(auth).catch(console.error);
+    });
+
+    // override local functions with cloud-backed ones
+    window.addPhoto = async function(rec){
+      // rec.thumb is dataURL JPEG — store to Storage, then Firestore doc with metadata
+      const id = `${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+      const path = `photos/${id}.jpg`;
+      await uploadString(ref(storage, path), rec.thumb, 'data_url');
+      const url = await getDownloadURL(ref(storage, path));
+      const docRef = await addDoc(collection(db,'photos'), {
+        name: rec.name,
+        author: rec.author||'',
+        caption: rec.caption||'',
+        tags: rec.tags||[],
+        createdAt: serverTimestamp(),
+        imageType: rec.imageType||'image/jpeg',
+        thumb: url,
+        owner: auth.currentUser?.uid || null,
+        storagePath: path
+      });
+      return !!docRef.id;
+    }
+
+    window.getAll = async function(){
+      const qs = query(collection(db,'photos'), orderBy('createdAt','desc'));
+      const snap = await getDocs(qs);
+      const items = snap.docs.map(d=>({ id: d.id, ...d.data(), createdAt: d.data().createdAt?.toMillis?.() || Date.now() }));
+      return items;
+    }
+
+    window.remove = async function(id){
+      // fetch doc to get path and owner
+      const dref = doc(db,'photos', id);
+      const snap = await (await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js')).getDoc(dref);
+      const data = snap.data();
+      // allow delete only if owner or rules permit
+      try{ if(data?.storagePath){ await deleteObject(ref(storage, data.storagePath)); } }catch(e){}
+      await deleteDoc(dref);
+    }
+
+
+  
+
+
+
+    window.clearAll = async function(){
+      // not recommended on cloud; keep as no-op to avoid mass deletes
+      alert('Cloud რეჟიმში მთლიანი გასუფთავება გამორთულია. წაშალეთ ცალ-ცალკე.');
+    }
+
+    // re-render with cloud data
+    if(window.renderGallery){ await window.renderGallery(); }
+
+    // Show hint
+    const n = document.createElement('div');
+    n.textContent = 'Cloud რეჟიმი ჩართულია (Firebase)';
+    n.style.cssText='position:fixed;right:12px;bottom:12px;background:#0a0;border-radius:12px;padding:8px 10px;color:#fff;opacity:.9;';
+    document.body.appendChild(n); setTimeout(()=>n.remove(),2000);
+
+    /* Firebase Security Rules (paste in console):
+    // Firestore (allow everyone to read; only owner can write/delete)
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /photos/{id} {
+          allow read: if true;
+          allow create: if request.auth != null;
+          allow update, delete: if request.auth != null && request.auth.uid == resource.data.owner;
+        }
+      }
+    }
+    // Storage rules (public read, owner write/delete)
+    rules_version = '2';
+    service firebase.storage {
+      match /b/{bucket}/o {
+        match /photos/{file} {
+          allow read: if true;
+          allow write: if request.auth != null;
+        }
+      }
+    }
+    */
+  })();
+}
+</script>
+</body>
+</html>
+ 
+
